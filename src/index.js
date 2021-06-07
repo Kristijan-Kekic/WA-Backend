@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import storage from './memory_storage';
+import storage from './memory_storage.js';
 import connect from './db.js';
 
 const app = express()
@@ -15,6 +15,24 @@ app.get('/ocjene', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find()
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
+app.get('/ocjenemin', async(req, res) => {
+    let db = await connect()
+
+    let cursor = await db.collection("ocjene").find().sort({ocjena:1})
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
+app.get('/ocjenemax', async(req, res) => {
+    let db = await connect()
+
+    let cursor = await db.collection("ocjene").find().sort({ocjena:-1})
     let results = await cursor.toArray()
     
     res.json(results)
