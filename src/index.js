@@ -20,6 +20,23 @@ app.get('/ocjene', async(req, res) => {
     res.json(results)
 })
 
+app.post('/ocjene', async(req, res) => {
+    let data = req.body;
+    delete data._id;
+
+    let db = await connect();
+    let result = await db.collection("ocjene").insertOne(data);
+    
+    if (result && result.insertedCount == 1) {
+        res.json(result.ops[0]);
+    }
+    else {
+        res.json({
+            status: "fail",
+        })
+    }
+})
+
 app.get('/ocjenemin', async(req, res) => {
     let db = await connect()
 
