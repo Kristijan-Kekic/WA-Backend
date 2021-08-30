@@ -56,6 +56,15 @@ app.get('/ocjenemax', async(req, res) => {
     res.json(results)
 })
 
+app.get('/ocjenespec', async(req, res) => {
+    let db = await connect()
+
+    let cursor = await db.collection("ocjene").find({ocjena:1})
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
 //obsolete ovo ispod
 app.post("/ocjene_memory", (req, res) => {
     let novaOcjena = req.body
