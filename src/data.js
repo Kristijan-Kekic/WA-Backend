@@ -1,3 +1,4 @@
+//obsolete sve
 let data = {
     korisnici:[
         {
