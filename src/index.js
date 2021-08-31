@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import storage from './memory_storage.js';
 import connect from './db.js';
+import mongo from 'mongodb'
 
 const app = express()
 const port = 3000
@@ -15,6 +16,14 @@ app.listen(port, () => console.log(`slusam na portu ${port}`))
 app.post('/ocjene', async(req, res) => {
     let data = req.body;
     delete data._id;
+
+    if (!data.profesor||!data.ocjena||!data.komentar) {
+        res.json({
+            status: "fail",
+            reason: "nešto vam nedostaje u unosu"
+        })
+        return
+    }
 
     let db = await connect();
     let result = await db.collection("ocjene").insertOne(data);
@@ -55,6 +64,32 @@ app.get('/ocjene', async(req, res) => {
     let results = await cursor.toArray()
     
     res.json(results)
+})
+
+app.get('/ocjene/:id', async(req, res) =>{
+    let {id} = req.params
+    let db = await connect()
+    let ocjena = await db.collection("ocjene").findOne({_id: mongo.ObjectId(id)})
+    res.json(ocjena)
+})
+
+app.put('/ocjene/:id', async(req, res) => {
+    let {id} = req.params
+    let {profesor, ocjena, komentar} = req.body
+    let ModOcjena = {}
+    if(profesor) ModOcjena.profesor = profesor
+    if(ocjena) ModOcjena.ocjena = ocjena
+    if(komentar) ModOcjena.komentar = komentar
+    let db = await connect()
+    let result = await db.collection("ocjene").updateOne({_id: mongo.ObjectId(id)}, {$set: ModOcjena})
+    res.json(result)
+})
+
+app.delete('/ocjene/:id', async(req, res)=> {
+    let {id} = req.params
+    let db = await connect()
+    await db.collection("ocjene").deleteOne({_id: mongo.ObjectId(id)})
+    res.json({msg: "Entry deleted"})
 })
 
 app.get('/ocjenemin', async(req, res) => {
