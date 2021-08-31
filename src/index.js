@@ -29,6 +29,25 @@ app.post('/ocjene', async(req, res) => {
     }
 })
 
+app.get('/ocjeneavg', async(req, res) => {
+    let db = await connect()
+
+    let cursor = await db.collection("ocjene").aggregate(
+        [
+          {
+            $group:
+              {
+                _id: "$profesor",
+                avgOcjena: { $avg: "$ocjena"},
+              }
+          }
+        ]
+     )
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
 app.get('/ocjene', async(req, res) => {
     let db = await connect()
 
