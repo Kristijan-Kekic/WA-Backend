@@ -3,6 +3,7 @@ import cors from 'cors';
 import storage from './memory_storage.js';
 import connect from './db.js';
 import mongo from 'mongodb'
+import auth from './auth.js';
 
 const app = express()
 const port = 3000
@@ -11,6 +12,19 @@ app.use(cors())
 app.use(express.json())
 
 app.listen(port, () => console.log(`slusam na portu ${port}`))
+
+app.post("/users", async (req, res) => {
+    let user = req.body;
+
+    let id;
+    try {
+        id = await auth.registerUser(user);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+
+    res.json({ id: id });
+});
 
 //unos ocjene
 app.post('/ocjene', async(req, res) => {
