@@ -70,7 +70,7 @@ app.post('/ocjene', [auth.verify], async(req, res) => {
     }
 })
 
-app.get('/ocjeneavg', [auth.verify], async(req, res) => {
+app.get('/ocjeneavg', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").aggregate(
@@ -89,10 +89,20 @@ app.get('/ocjeneavg', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjene', [auth.verify], async(req, res) => {
+app.get('/ocjene', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({profesor:1})
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
+app.post('/ocjeneedit', async(req, res) => {
+    let db = await connect()
+
+    let {username} = req.body;
+    let cursor = await db.collection("ocjene").find({korisnik: username})
     let results = await cursor.toArray()
     
     res.json(results)
@@ -124,7 +134,7 @@ app.delete('/ocjene/:id', [auth.verify], async(req, res)=> {
     res.json({msg: "Entry deleted"})
 })
 
-app.get('/ocjenemin', [auth.verify], async(req, res) => {
+app.get('/ocjenemin', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({ocjena:1})
@@ -133,7 +143,7 @@ app.get('/ocjenemin', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenemax', [auth.verify], async(req, res) => {
+app.get('/ocjenemax', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({ocjena:-1})
@@ -142,7 +152,7 @@ app.get('/ocjenemax', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenejedan', [auth.verify], async(req, res) => {
+app.get('/ocjenejedan', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:1})
@@ -151,7 +161,7 @@ app.get('/ocjenejedan', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenedva', [auth.verify], async(req, res) => {
+app.get('/ocjenedva', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:2})
@@ -160,7 +170,7 @@ app.get('/ocjenedva', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenetri', [auth.verify], async(req, res) => {
+app.get('/ocjenetri', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:3})
@@ -169,7 +179,7 @@ app.get('/ocjenetri', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenecetiri', [auth.verify], async(req, res) => {
+app.get('/ocjenecetiri', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:4})
@@ -178,7 +188,7 @@ app.get('/ocjenecetiri', [auth.verify], async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenepet', [auth.verify], async(req, res) => {
+app.get('/ocjenepet', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:5})
