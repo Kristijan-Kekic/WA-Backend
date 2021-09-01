@@ -10,7 +10,7 @@ const port = 3000
 app.use(cors())
 app.use(express.json())
 
-app.listen(port, () => console.log(`slusam na portu ${port}`))
+//app.listen(port, () => console.log(`slusam na portu ${port}`))
 
 //unos ocjene
 app.post('/ocjene', async(req, res) => {
@@ -110,10 +110,19 @@ app.get('/ocjenemax', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenespec', async(req, res) => {
+app.get('/ocjenejedan', async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:1})
+    let results = await cursor.toArray()
+    
+    res.json(results)
+})
+
+app.get('/ocjenedva', async(req, res) => {
+    let db = await connect()
+
+    let cursor = await db.collection("ocjene").find({ocjena:2})
     let results = await cursor.toArray()
     
     res.json(results)
