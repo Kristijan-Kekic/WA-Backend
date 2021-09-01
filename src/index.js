@@ -4,6 +4,8 @@ import storage from './memory_storage.js';
 import connect from './db.js';
 import mongo from 'mongodb'
 import auth from './auth.js';
+import dotenv from "dotenv"
+dotenv.config();
 
 const app = express()
 const port = 3000
@@ -12,6 +14,22 @@ app.use(cors())
 app.use(express.json())
 
 app.listen(port, () => console.log(`slusam na portu ${port}`))
+
+app.get("/tajna", [auth.verify], (req, res) => {
+    res.json({message: "Ovo je tajna " + req.jwt.username});
+});
+
+app.post("/auth", async (req, res) => {
+    let user = req.body;
+
+    try {
+        let result = await auth.authenticateUser(user.username, user.password);
+        res.json(result)
+    }
+    catch (e) {
+        res.status(401).json({ error: e.message });
+    }
+});
 
 app.post("/users", async (req, res) => {
     let user = req.body;
@@ -27,7 +45,7 @@ app.post("/users", async (req, res) => {
 });
 
 //unos ocjene
-app.post('/ocjene', async(req, res) => {
+app.post('/ocjene', [auth.verify], async(req, res) => {
     let data = req.body;
     delete data._id;
 
@@ -52,7 +70,7 @@ app.post('/ocjene', async(req, res) => {
     }
 })
 
-app.get('/ocjeneavg', async(req, res) => {
+app.get('/ocjeneavg', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").aggregate(
@@ -71,7 +89,7 @@ app.get('/ocjeneavg', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjene', async(req, res) => {
+app.get('/ocjene', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({profesor:1})
@@ -80,14 +98,14 @@ app.get('/ocjene', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjene/:id', async(req, res) =>{
+app.get('/ocjene/:id', [auth.verify], async(req, res) =>{
     let {id} = req.params
     let db = await connect()
     let ocjena = await db.collection("ocjene").findOne({_id: mongo.ObjectId(id)})
     res.json(ocjena)
 })
 
-app.put('/ocjene/:id', async(req, res) => {
+app.put('/ocjene/:id', [auth.verify], async(req, res) => {
     let {id} = req.params
     let {profesor, ocjena, komentar} = req.body
     let ModOcjena = {}
@@ -99,14 +117,14 @@ app.put('/ocjene/:id', async(req, res) => {
     res.json(result)
 })
 
-app.delete('/ocjene/:id', async(req, res)=> {
+app.delete('/ocjene/:id', [auth.verify], async(req, res)=> {
     let {id} = req.params
     let db = await connect()
     await db.collection("ocjene").deleteOne({_id: mongo.ObjectId(id)})
     res.json({msg: "Entry deleted"})
 })
 
-app.get('/ocjenemin', async(req, res) => {
+app.get('/ocjenemin', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({ocjena:1})
@@ -115,7 +133,7 @@ app.get('/ocjenemin', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenemax', async(req, res) => {
+app.get('/ocjenemax', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find().sort({ocjena:-1})
@@ -124,7 +142,7 @@ app.get('/ocjenemax', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenejedan', async(req, res) => {
+app.get('/ocjenejedan', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:1})
@@ -133,7 +151,7 @@ app.get('/ocjenejedan', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenedva', async(req, res) => {
+app.get('/ocjenedva', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:2})
@@ -142,7 +160,7 @@ app.get('/ocjenedva', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenetri', async(req, res) => {
+app.get('/ocjenetri', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:3})
@@ -151,7 +169,7 @@ app.get('/ocjenetri', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenecetiri', async(req, res) => {
+app.get('/ocjenecetiri', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:4})
@@ -160,7 +178,7 @@ app.get('/ocjenecetiri', async(req, res) => {
     res.json(results)
 })
 
-app.get('/ocjenepet', async(req, res) => {
+app.get('/ocjenepet', [auth.verify], async(req, res) => {
     let db = await connect()
 
     let cursor = await db.collection("ocjene").find({ocjena:5})
@@ -168,13 +186,3 @@ app.get('/ocjenepet', async(req, res) => {
     
     res.json(results)
 })
-
-//obsolete ovo ispod
-app.post("/ocjene_memory", (req, res) => {
-    let novaOcjena = req.body
-    console.log(novaOcjena)
-});
-
-app.get("/ocjene_memory", (req, res) => {
-    res.json(storage.ocjene)
-});
