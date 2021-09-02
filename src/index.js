@@ -13,7 +13,7 @@ const port = 3000
 app.use(cors())
 app.use(express.json())
 
-app.listen(port, () => console.log(`slusam na portu ${port}`))
+//app.listen(port, () => console.log(`slusam na portu ${port}`))
 
 app.get("/tajna", [auth.verify], (req, res) => {
     res.json({message: "Ovo je tajna " + req.jwt.username});
@@ -27,7 +27,7 @@ app.post("/auth", async (req, res) => {
         res.json(result)
     }
     catch (e) {
-        res.status(401).json({ error: e.message });
+        res.status(401).json({ error: 'Pogrešni podaci za prijavu' });
     }
 });
 
