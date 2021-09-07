@@ -97,7 +97,7 @@ app.get('/ocjene', async(req, res) => {
     
     res.json(results)
 })
-
+//Hvata ocjene od trenutnog korisnika
 app.post('/ocjeneedit', async(req, res) => {
     let db = await connect()
 
@@ -107,26 +107,26 @@ app.post('/ocjeneedit', async(req, res) => {
     
     res.json(results)
 })
-
-app.get('/ocjene/:id', [auth.verify], async(req, res) =>{
+//Dohvat 1 ocjene
+app.get('/ocjene/:id', [auth.verify], async(req, res) =>{ //dohvat jedne ocjene preko :id
     let {id} = req.params
     let db = await connect()
     let ocjena = await db.collection("ocjene").findOne({_id: mongo.ObjectId(id)})
     res.json(ocjena)
 })
-
+//Edit ocjene
 app.put('/ocjene/:id', [auth.verify], async(req, res) => {
-    let {id} = req.params
-    let {profesor, ocjena, komentar} = req.body
+    let {id} = req.params //vuce iz rute :id
+    let {profesor, ocjena, komentar} = req.body //vuce iz tijela
     let ModOcjena = {}
-    if(profesor) ModOcjena.profesor = profesor
+    if(profesor) ModOcjena.profesor = profesor //provjera dali postoje
     if(ocjena) ModOcjena.ocjena = ocjena
     if(komentar) ModOcjena.komentar = komentar
     let db = await connect()
     let result = await db.collection("ocjene").updateOne({_id: mongo.ObjectId(id)}, {$set: ModOcjena})
     res.json(result)
 })
-
+//Delete ocjene
 app.delete('/ocjene/:id', [auth.verify], async(req, res)=> {
     let {id} = req.params
     let db = await connect()
